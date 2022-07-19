@@ -127,7 +127,7 @@
             </form>
         </div>
         <?php endforeach; ?> -->
-
+        <?php var_dump($tasks);?>
         <div class="task">
             <div class="description">
                 Some text
