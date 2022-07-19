@@ -60,7 +60,7 @@
             font-weight: bold;
             display: inline-block;
             width: 200px;
-            clear:right;
+            clear: right;
             word-break: break-all;
         }
 
@@ -110,41 +110,38 @@
     </div>
 
     <div class="tasks">
-        <!-- <?php foreach ($notes as $note): ?>
-        <div class="note">
-            <div class="title">
-                <a href="?id=<?php echo $note->id ?>">
-                    <?php echo $note->title ?>
-                </a>
-            </div>
-            <div class="description">
-                <?php echo $note->description ?>
-            </div>
-            <small><?php echo date('d/m/Y', strtotime($note->createDate)) ?></small>
-            <form action="/delete" method="post">
-                <input type="hidden" name="id" value="<?php echo $note->id ?>">
-                <button class="close">X</button>
-            </form>
-        </div>
-        <?php endforeach; ?> -->
-        <?php var_dump($tasks);?>
-        <div class="task">
-            <div class="description">
-                Some text
-            </div>
+        <?php foreach ($tasks as $task): ?>
+            <div class="task">
+                <div class="description">
+                    <?php echo $task['description'] ?>
+                </div>
 
-            <img src="../views/Green_circle.svg">
+                <img src=
+                    <?php
+                    if ($task['checked'])
+                        echo 'Green_circle.svg';
+                    else
+                        echo 'Red_circle.svg';
+                    ?>>
 
-            <form action="/check" class="check" method="post">
-                <input type="hidden" name="id" value="<?php //echo $note->id ?>">
-                <button> READY </button>
-            </form>
+                <form action="/check" class="check" method="post">
+                    <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
+                    <button>
+                        <?php
+                        if ($task['checked'])
+                            echo 'UNREADY';
+                        else
+                            echo 'READY';
+                        ?>
+                    </button>
+                </form>
 
-            <form action="/delete" class="delete" method="post">
-                <input type="hidden" name="id" value="<?php //echo $note->id ?>">
-                <button> DELETE </button>
-            </form>
-        </div>
+                <form action="/delete" class="delete" method="post">
+                    <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
+                    <button> DELETE</button>
+                </form>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>
 </body>

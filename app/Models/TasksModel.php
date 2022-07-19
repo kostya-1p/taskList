@@ -18,8 +18,11 @@ class TasksModel
 
     public function addTask()
     {
-        $task = array("id" => uniqid(), "description" => $_POST['description'], "checked" => false);
-        $this->tasks[] = $task;
-        setcookie('tasks', json_encode($this->tasks), time() + (10 * 365 * 24 * 60 * 60));
+        if (!empty($_POST['description'])) {
+            $task = array("id" => uniqid(), "description" => $_POST['description'], "checked" => false);
+            $currentTasks = $this->getTasks();
+            $currentTasks[] = $task;
+            setcookie('tasks', json_encode($currentTasks), time() + (10 * 365 * 24 * 60 * 60));
+        }
     }
 }
