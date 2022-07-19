@@ -11,7 +11,8 @@ define('VIEW_PATH', __DIR__ . '/../views');
 
 $router = new Router();
 $router->get('/', [\App\Controllers\HomeController::class, 'index'])
-       ->post('/create', [\App\Controllers\HomeController::class, 'create']);
+    ->post('/create', [\App\Controllers\HomeController::class, 'create'])
+    ->post('/delete', [\App\Controllers\HomeController::class, 'delete']);
 
 (new App(
     $router,

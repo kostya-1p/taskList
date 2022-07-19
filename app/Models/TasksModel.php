@@ -16,13 +16,30 @@ class TasksModel
         return [];
     }
 
-    public function addTask()
+    public function addTask(): void
     {
         if (!empty($_POST['description'])) {
             $task = array("id" => uniqid(), "description" => $_POST['description'], "checked" => false);
             $currentTasks = $this->getTasks();
             $currentTasks[] = $task;
-            setcookie('tasks', json_encode($currentTasks), time() + (10 * 365 * 24 * 60 * 60));
+            $this->setTasksToCookie($currentTasks);
         }
+    }
+
+    public function deleteTask(): void
+    {
+        $id = $_POST['id'];
+        if (!empty($id)) {
+            $currentTasks = $this->getTasks();
+            $ids = array_column($currentTasks, 'id');
+            $foundKey = array_search($id, $ids);
+            array_splice($currentTasks, $foundKey, 1);
+            $this->setTasksToCookie($currentTasks);
+        }
+    }
+
+    private function setTasksToCookie(array $tasks): void
+    {
+        setcookie('tasks', json_encode($tasks), time() + (10 * 365 * 24 * 60 * 60));
     }
 }

@@ -18,12 +18,18 @@ class HomeController
     public function index(): View
     {
         $tasks = $this->tasksModel->getTasks();
-        return View::make('index', ['tasks'=>$tasks]);
+        return View::make('index', ['tasks' => $tasks]);
     }
 
     public function create()
     {
         $this->tasksModel->addTask();
+        header("Location: /");
+    }
+
+    public function delete()
+    {
+        $this->tasksModel->deleteTask();
         header("Location: /");
     }
 }
