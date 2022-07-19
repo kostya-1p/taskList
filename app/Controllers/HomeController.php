@@ -32,4 +32,22 @@ class HomeController
         $this->tasksModel->deleteTask();
         header("Location: /");
     }
+
+    public function deleteAllTasks()
+    {
+        $this->tasksModel->deleteAllTasks();
+        header("Location: /");
+    }
+
+    public function checkTask()
+    {
+        $this->tasksModel->checkTask();
+        header("Location: /");
+    }
+
+    public function checkAllTasks()
+    {
+        $this->tasksModel->checkAllTasks();
+        header("Location: /");
+    }
 }
