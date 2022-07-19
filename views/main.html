@@ -43,6 +43,7 @@
             flex-direction: column;
             flex-wrap: wrap;
             align-items: center;
+
         }
 
         .task {
@@ -133,15 +134,15 @@
                 Some text
             </div>
 
-            <img src="../views/Green_circle.svg">
+            <img src="Green_circle.svg">
 
             <form action="/check" class="check" method="post">
-                <input type="hidden" name="id" value="<?php //echo $note->id ?>">
+                <input type="hidden" name="id" value="<?php echo $note->id ?>">
                 <button> READY </button>
             </form>
 
             <form action="/delete" class="delete" method="post">
-                <input type="hidden" name="id" value="<?php //echo $note->id ?>">
+                <input type="hidden" name="id" value="<?php echo $note->id ?>">
                 <button> DELETE </button>
             </form>
         </div>
