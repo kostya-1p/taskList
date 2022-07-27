@@ -13,6 +13,7 @@ define('VIEW_PATH', __DIR__ . '/../views');
 
 $router = new Router();
 $router->get('/', [\App\Controllers\LoginController::class, 'index'])
+    ->post('/login', [\App\Controllers\LoginController::class, 'login'])
     ->get('/registrationForm', [\App\Controllers\RegistrationController::class, 'index'])
     ->get('/tasks', [\App\Controllers\HomeController::class, 'index'])
     ->post('/create', [\App\Controllers\HomeController::class, 'create'])

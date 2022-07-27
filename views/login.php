@@ -15,15 +15,16 @@
         <p>Please fill in your credentials to login.</p>
 
         <?php
-        if(!empty($login_err)){
-            echo '<div class="alert alert-danger">' . $login_err . '</div>';
+        if(!empty($loginErr)){
+            echo '<div class="alert alert-danger">' . $loginErr . '</div>';
         }
         ?>
+
 
         <form action="/login" method="post">
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" name="username" class="form-control">
+                <input type="text" name="login" class="form-control">
             </div>
             <div class="form-group">
                 <label>Password</label>
