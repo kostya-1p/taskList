@@ -15,12 +15,13 @@ $router = new Router();
 $router->get('/', [\App\Controllers\LoginController::class, 'index'])
     ->post('/login', [\App\Controllers\LoginController::class, 'login'])
     ->get('/registrationForm', [\App\Controllers\RegistrationController::class, 'index'])
+    ->post('/register', [\App\Controllers\RegistrationController::class, 'register'])
     ->get('/tasks', [\App\Controllers\HomeController::class, 'index'])
     ->post('/create', [\App\Controllers\HomeController::class, 'create'])
     ->post('/delete', [\App\Controllers\HomeController::class, 'delete'])
     ->post('/delete_all', [\App\Controllers\HomeController::class, 'deleteAllTasks'])
-    ->post('/check',  [\App\Controllers\HomeController::class, 'checkTask'])
-    ->post('/check_all',  [\App\Controllers\HomeController::class, 'checkAllTasks']);
+    ->post('/check', [\App\Controllers\HomeController::class, 'checkTask'])
+    ->post('/check_all', [\App\Controllers\HomeController::class, 'checkAllTasks']);
 
 (new App(
     $router,

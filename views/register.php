@@ -14,15 +14,15 @@
     <h2>Sign Up</h2>
     <p>Please fill this form to create an account.</p>
     <?php
-    if(!empty($login_err)){
-        echo '<div class="alert alert-danger">' . $login_err . '</div>';
+    if(!empty($registerErr)){
+        echo '<div class="alert alert-danger">' . $registerErr . '</div>';
     }
     ?>
 
     <form action="/register" method="post">
         <div class="form-group">
             <label>Username</label>
-            <input type="text" name="username" class="form-control"">
+            <input type="text" name="login" class="form-control"">
         </div>
         <div class="form-group">
             <label>Password</label>
