@@ -7,10 +7,14 @@ use App\Router;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
+$dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
 define('VIEW_PATH', __DIR__ . '/../views');
 
 $router = new Router();
-$router->get('/', [\App\Controllers\HomeController::class, 'index'])
+$router->get('/', [\App\Controllers\LoginController::class, 'index'])
+    ->get('/registrationForm', [\App\Controllers\RegistrationController::class, 'index'])
+    ->get('/tasks', [\App\Controllers\HomeController::class, 'index'])
     ->post('/create', [\App\Controllers\HomeController::class, 'create'])
     ->post('/delete', [\App\Controllers\HomeController::class, 'delete'])
     ->post('/delete_all', [\App\Controllers\HomeController::class, 'deleteAllTasks'])
@@ -19,5 +23,6 @@ $router->get('/', [\App\Controllers\HomeController::class, 'index'])
 
 (new App(
     $router,
-    ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']]
+    ['uri' => $_SERVER['REQUEST_URI'], 'method' => $_SERVER['REQUEST_METHOD']],
+    new Config($_ENV)
 ))->run();
