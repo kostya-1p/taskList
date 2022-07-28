@@ -19,6 +19,12 @@ services:
     volumes:
       - ../:/var/www
       - ./nginx:/etc/nginx/conf.d
+  composer_installation:
+    container_name: composer_installation
+    image: composer
+    volumes:
+      - ../:/app
+    command: sh -c "composer install --ignore-platform-reqs && cp .env.example .env"
   db:
     container_name: tasks-db
     image: mysql:8.0
