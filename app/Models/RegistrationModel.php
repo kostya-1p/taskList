@@ -14,6 +14,7 @@ class RegistrationModel extends Model
         if ($this->isLoginUnique($login))
         {
             $this->insertUser($query, $login, $hashedPassword);
+            $this->saveLastInsertedUserToSession($login);
             return true;
         }
         return false;
@@ -24,16 +25,32 @@ class RegistrationModel extends Model
         return "INSERT INTO users (login, password) VALUES (:login, :password)";
     }
 
-    private function isLoginUnique(string $login)
+    private function getUserByLogin(string $login): \PDOStatement
     {
         $query = "SELECT id FROM users WHERE login = :login";
         $stmt = $this->db->prepare($query);
         $stmt->bindParam('login', $login);
         $stmt->execute();
+        return $stmt;
+    }
+
+    private function isLoginUnique(string $login)
+    {
+        $stmt = $this->getUserByLogin($login);
 
         if ($stmt->rowCount() > 0)
             return false;
         return true;
+    }
+
+    private function saveLastInsertedUserToSession(string $login)
+    {
+        $stmt = $this->getUserByLogin($login);
+        $user = $stmt->fetch();
+
+        $_SESSION["loggedin"] = true;
+        $_SESSION["id"] = $user['id'];
+        $_SESSION["login"] = $login;
     }
 
     private function insertUser(string $query, string $login, string $hashedPassword): void

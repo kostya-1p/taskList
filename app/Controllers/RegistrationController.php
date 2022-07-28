@@ -34,6 +34,7 @@ class RegistrationController
             return $this->sendErrorMessage('Passwords are not equal');
         }
 
+        session_start();
         $result = $registrationModel->registerUser($login, $password);
         if ($result)
         {

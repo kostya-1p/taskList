@@ -26,6 +26,13 @@ class LoginModel extends Model
         return $stmt;
     }
 
+    private function saveUserDataToSession(array $users)
+    {
+        $_SESSION["loggedin"] = true;
+        $_SESSION["id"] = $users[0]['id'];
+        $_SESSION["login"] = $users[0]['login'];
+    }
+
     private function isPasswordCorrect(\PDOStatement $stmt, string $password): bool
     {
         if ($stmt->rowCount() == 1)
@@ -33,9 +40,13 @@ class LoginModel extends Model
             $users = $stmt->fetchAll();
             $hashed_password = $users[0]['password'];
             if (password_verify($password, $hashed_password))
+            {
+                $this->saveUserDataToSession($users);
                 return true;
-            else
+            } else
+            {
                 return false;
+            }
         }
         return false;
     }

@@ -17,6 +17,13 @@ class HomeController
 
     public function index(): View
     {
+        session_start();
+        if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
+        {
+            header("location: /");
+            exit;
+        }
+
         $tasks = $this->tasksModel->getTasks();
         return View::make('index', ['tasks' => $tasks]);
     }

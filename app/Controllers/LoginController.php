@@ -14,6 +14,7 @@ class LoginController
 
     public function login()
     {
+        session_start();
         $login = htmlspecialchars($_POST['login']);
         $password = htmlspecialchars($_POST['password']);
 
