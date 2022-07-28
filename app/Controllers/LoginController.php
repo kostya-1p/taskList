@@ -12,19 +12,24 @@ class LoginController
         return View::make('login');
     }
 
-    public function login()
+    public function login(): View
     {
         session_start();
+
+        //handle user input
         $login = htmlspecialchars($_POST['login']);
         $password = htmlspecialchars($_POST['password']);
 
+        //Find user with entered login and password in database
         $loginModel = new LoginModel();
-        $isFound = $loginModel->isUserLogged($login, $password);
+        $isUserFound = $loginModel->isUserLogged($login, $password);
 
-        if ($isFound)
+        if ($isUserFound)
         {
             header('Location: /tasks');
         }
+
+        //Send login error to View
         return View::make('login', ['loginErr' => 'Invalid Login or Password']);
     }
 }

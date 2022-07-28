@@ -17,6 +17,7 @@ class HomeController
 
     public function index(): View
     {
+        //Check if user is logged in
         session_start();
         if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
         {
@@ -24,40 +25,46 @@ class HomeController
             exit;
         }
 
+        //Get tasks and send them to View
         $tasks = $this->tasksModel->getTasks();
         return View::make('index', ['tasks' => $tasks]);
     }
 
     public function create()
     {
-        session_start();
-        $this->tasksModel->addTask();
-        header("Location: /tasks");
+        $this->callTaskModelFunction('create');
     }
 
     public function delete()
     {
-        $this->tasksModel->deleteTask();
-        header("Location: /tasks");
+        $this->callTaskModelFunction('deleteTask');
     }
 
     public function deleteAllTasks()
     {
-        session_start();
-        $this->tasksModel->deleteAllTasks();
-        header("Location: /tasks");
+        $this->callTaskModelFunction('deleteAllTasks');
     }
 
     public function checkTask()
     {
-        $this->tasksModel->checkTask();
-        header("Location: /tasks");
+        $this->callTaskModelFunction('checkTask');
     }
 
     public function checkAllTasks()
     {
+        $this->callTaskModelFunction('checkAllTasks');
+    }
+
+    private function callTaskModelFunction(string $methodName)
+    {
+        //Call method from task model and go to /tasks page
         session_start();
-        $this->tasksModel->checkAllTasks();
+        $this->tasksModel->{$methodName}();
+        $this->setHeader();
+    }
+
+    private function setHeader()
+    {
         header("Location: /tasks");
     }
 }

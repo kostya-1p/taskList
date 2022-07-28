@@ -18,30 +18,26 @@ class LoginModel extends Model
         return "SELECT * FROM users WHERE login = :login";
     }
 
-    private function getUserFromDB(string $query, string $login)
+    private function getUserFromDB(string $query, string $login): \PDOStatement
     {
+        //Get User from DB by login
         $stmt = $this->db->prepare($query);
         $stmt->bindParam('login', $login);
         $stmt->execute();
         return $stmt;
     }
 
-    private function saveUserDataToSession(array $users)
-    {
-        $_SESSION["loggedin"] = true;
-        $_SESSION["id"] = $users[0]['id'];
-        $_SESSION["login"] = $users[0]['login'];
-    }
-
     private function isPasswordCorrect(\PDOStatement $stmt, string $password): bool
     {
+        //Check if found only one user
         if ($stmt->rowCount() == 1)
         {
-            $users = $stmt->fetchAll();
-            $hashed_password = $users[0]['password'];
-            if (password_verify($password, $hashed_password))
+            //Get password from DB and compare with user input password
+            $usersArray = $stmt->fetchAll();
+            $hashedPassword = $usersArray[0]['password'];
+            if (password_verify($password, $hashedPassword))
             {
-                $this->saveUserDataToSession($users);
+                $this->saveUserDataToSession($usersArray);
                 return true;
             } else
             {
@@ -49,5 +45,12 @@ class LoginModel extends Model
             }
         }
         return false;
+    }
+
+    private function saveUserDataToSession(array $users)
+    {
+        $_SESSION["loggedin"] = true;
+        $_SESSION["id"] = $users[0]['id'];
+        $_SESSION["login"] = $users[0]['login'];
     }
 }

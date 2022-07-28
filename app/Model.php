@@ -12,4 +12,16 @@ abstract class Model
     {
         $this->db = App::db();
     }
+
+    protected function executeQuery(string $query, array $paramNames, array $paramValues): \PDOStatement
+    {
+        $stmt = $this->db->prepare($query);
+        for ($i = 0; $i < count($paramNames); $i++)
+        {
+            $stmt->bindParam($paramNames[$i], $paramValues[$i]);
+        }
+
+        $stmt->execute();
+        return $stmt;
+    }
 }

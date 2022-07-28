@@ -9,11 +9,11 @@ class RegistrationModel extends Model
     public function registerUser(string $login, string $password): bool
     {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-        $query = $this->getQuery();
+        $insertQuery = $this->getQuery();
 
         if ($this->isLoginUnique($login))
         {
-            $this->insertUser($query, $login, $hashedPassword);
+            $this->insertUser($insertQuery, $login, $hashedPassword);
             $this->saveLastInsertedUserToSession($login);
             return true;
         }
@@ -25,16 +25,7 @@ class RegistrationModel extends Model
         return "INSERT INTO users (login, password) VALUES (:login, :password)";
     }
 
-    private function getUserByLogin(string $login): \PDOStatement
-    {
-        $query = "SELECT id FROM users WHERE login = :login";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam('login', $login);
-        $stmt->execute();
-        return $stmt;
-    }
-
-    private function isLoginUnique(string $login)
+    private function isLoginUnique(string $login): bool
     {
         $stmt = $this->getUserByLogin($login);
 
@@ -43,7 +34,18 @@ class RegistrationModel extends Model
         return true;
     }
 
-    private function saveLastInsertedUserToSession(string $login)
+    private function getUserByLogin(string $login): \PDOStatement
+    {
+        $query = "SELECT id FROM users WHERE login = :login";
+        return $this->executeQuery($query, ['login'], [$login]);
+    }
+
+    private function insertUser(string $query, string $login, string $hashedPassword): void
+    {
+        $this->executeQuery($query, ['login', 'password'], [$login, $hashedPassword]);
+    }
+
+    private function saveLastInsertedUserToSession(string $login): void
     {
         $stmt = $this->getUserByLogin($login);
         $user = $stmt->fetch();
@@ -51,13 +53,5 @@ class RegistrationModel extends Model
         $_SESSION["loggedin"] = true;
         $_SESSION["id"] = $user['id'];
         $_SESSION["login"] = $login;
-    }
-
-    private function insertUser(string $query, string $login, string $hashedPassword): void
-    {
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam('login', $login);
-        $stmt->bindParam('password', $hashedPassword);
-        $stmt->execute();
     }
 }
