@@ -2,13 +2,21 @@
 
 namespace App\Models;
 
-class TasksModel
-{
+use App\Model;
 
+class TasksModel extends Model
+{
     public function getTasks(): array
     {
-        if (isset($_COOKIE['tasks'])) {
-            return json_decode($_COOKIE['tasks'], true);
+        $query = "SELECT id, description, status FROM tasks WHERE user_id = :user_id
+                  ORDER BY created_at";
+        $stmt = $this->db->prepare($query);
+        $stmt->bindParam('user_id', $_SESSION['id']);
+        $stmt->execute();
+
+        if ($stmt->rowCount() > 0)
+        {
+            return $stmt->fetchAll();
         }
 
         return [];
@@ -16,7 +24,8 @@ class TasksModel
 
     public function addTask(): void
     {
-        if (!empty($_POST['description'])) {
+        if (!empty($_POST['description']))
+        {
             $task = array("id" => uniqid(), "description" => $_POST['description'], "checked" => false);
             $currentTasks = $this->getTasks();
             $currentTasks[] = $task;
@@ -34,7 +43,8 @@ class TasksModel
     public function deleteTask(): void
     {
         $id = $_POST['id'];
-        if (!empty($id)) {
+        if (!empty($id))
+        {
             $currentTasks = $this->getTasks();
             $foundKey = $this->findTaskByID($currentTasks, $id);
             array_splice($currentTasks, $foundKey, 1);
@@ -49,11 +59,13 @@ class TasksModel
 
     public function deleteAllTasks(): bool
     {
-        if (isset($_COOKIE['tasks'])) {
+        if (isset($_COOKIE['tasks']))
+        {
             unset($_COOKIE['tasks']);
             setcookie('tasks', null, -1);
             return true;
-        } else {
+        } else
+        {
             return false;
         }
     }
@@ -61,7 +73,8 @@ class TasksModel
     public function checkTask(): void
     {
         $id = $_POST['id'];
-        if (!empty($id)) {
+        if (!empty($id))
+        {
             $currentTasks = $this->getTasks();
             $foundKey = $this->findTaskByID($currentTasks, $id);
             $currentTasks[$foundKey]['checked'] = !$currentTasks[$foundKey]['checked'];
@@ -72,7 +85,8 @@ class TasksModel
     public function checkAllTasks(): void
     {
         $currentTasks = $this->getTasks();
-        for ($i = 0; $i < count($currentTasks); $i++){
+        for ($i = 0; $i < count($currentTasks); $i++)
+        {
             $currentTasks[$i]['checked'] = true;
         }
         $this->setTasksToCookie($currentTasks);

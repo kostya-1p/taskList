@@ -41,7 +41,7 @@
 
                 <img src=
                     <?php
-                    if ($task['checked'])
+                    if ($task['status'])
                         echo "img/Green_circle.svg";
                     else
                         echo "img/Red_circle.svg";
@@ -51,7 +51,7 @@
                     <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
                     <button>
                         <?php
-                        if ($task['checked'])
+                        if ($task['status'])
                             echo 'UNREADY';
                         else
                             echo 'READY';
