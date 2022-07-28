@@ -36,7 +36,7 @@ class TasksModel extends Model
     public function deleteTask(): void
     {
         $taskId = $_POST['id'];
-        if (!empty($id))
+        if (!empty($taskId))
         {
             $query = "DELETE FROM tasks WHERE id = :id";
             $this->executeQuery($query, ['id'], [$taskId]);
@@ -52,7 +52,7 @@ class TasksModel extends Model
     public function checkTask(): void
     {
         $taskId = $_POST['id'];
-        if (!empty($id))
+        if (!empty($taskId))
         {
             //Change task status to opposite
             $query = "UPDATE tasks SET status = (status - 1) * -1 WHERE id = :id";

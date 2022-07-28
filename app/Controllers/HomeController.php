@@ -32,7 +32,7 @@ class HomeController
 
     public function create()
     {
-        $this->callTaskModelFunction('create');
+        $this->callTaskModelFunction('addTask');
     }
 
     public function delete()
