@@ -30,31 +30,34 @@ class HomeController
 
     public function create()
     {
+        session_start();
         $this->tasksModel->addTask();
-        header("Location: /");
+        header("Location: /tasks");
     }
 
     public function delete()
     {
         $this->tasksModel->deleteTask();
-        header("Location: /");
+        header("Location: /tasks");
     }
 
     public function deleteAllTasks()
     {
+        session_start();
         $this->tasksModel->deleteAllTasks();
-        header("Location: /");
+        header("Location: /tasks");
     }
 
     public function checkTask()
     {
         $this->tasksModel->checkTask();
-        header("Location: /");
+        header("Location: /tasks");
     }
 
     public function checkAllTasks()
     {
+        session_start();
         $this->tasksModel->checkAllTasks();
-        header("Location: /");
+        header("Location: /tasks");
     }
 }

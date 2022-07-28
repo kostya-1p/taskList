@@ -6,13 +6,23 @@ use App\Model;
 
 class TasksModel extends Model
 {
+    private function executeQuery(string $query, array $paramNames, array $paramValues): \PDOStatement
+    {
+        $stmt = $this->db->prepare($query);
+        for ($i = 0; $i < count($paramNames); $i++)
+        {
+            $stmt->bindParam($paramNames[$i], $paramValues[$i]);
+        }
+
+        $stmt->execute();
+        return $stmt;
+    }
+
     public function getTasks(): array
     {
         $query = "SELECT id, description, status FROM tasks WHERE user_id = :user_id
                   ORDER BY created_at";
-        $stmt = $this->db->prepare($query);
-        $stmt->bindParam('user_id', $_SESSION['id']);
-        $stmt->execute();
+        $stmt = $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
 
         if ($stmt->rowCount() > 0)
         {
@@ -26,18 +36,10 @@ class TasksModel extends Model
     {
         if (!empty($_POST['description']))
         {
-            $task = array("id" => uniqid(), "description" => $_POST['description'], "checked" => false);
-            $currentTasks = $this->getTasks();
-            $currentTasks[] = $task;
-            $this->setTasksToCookie($currentTasks);
+            $description = htmlspecialchars($_POST['description']);
+            $query = "INSERT INTO tasks(user_id, description) VALUES (:user_id, :description)";
+            $this->executeQuery($query, ['user_id', 'description'], [$_SESSION['id'], $description]);
         }
-    }
-
-    private function findTaskByID(array $tasks, string $id): int
-    {
-        $ids = array_column($tasks, 'id');
-        $foundKey = array_search($id, $ids);
-        return $foundKey;
     }
 
     public function deleteTask(): void
@@ -45,29 +47,23 @@ class TasksModel extends Model
         $id = $_POST['id'];
         if (!empty($id))
         {
-            $currentTasks = $this->getTasks();
-            $foundKey = $this->findTaskByID($currentTasks, $id);
-            array_splice($currentTasks, $foundKey, 1);
-            $this->setTasksToCookie($currentTasks);
+            $query = "DELETE FROM tasks WHERE id = :id";
+            $this->executeQuery($query, ['id'], [$id]);
         }
     }
 
-    private function setTasksToCookie(array $tasks): void
+    public function deleteAllTasks(): void
     {
-        setcookie('tasks', json_encode($tasks), time() + (10 * 365 * 24 * 60 * 60));
+        $query = "DELETE FROM tasks WHERE user_id = :user_id";
+        $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
     }
 
-    public function deleteAllTasks(): bool
+    private function getTaskStatus(int $id): int
     {
-        if (isset($_COOKIE['tasks']))
-        {
-            unset($_COOKIE['tasks']);
-            setcookie('tasks', null, -1);
-            return true;
-        } else
-        {
-            return false;
-        }
+        $query = "SELECT status FROM tasks WHERE id = :id";
+        $stmt = $this->executeQuery($query, ['id'], [$id]);
+        $task = $stmt->fetch();
+        return $task['id'];
     }
 
     public function checkTask(): void
@@ -75,20 +71,14 @@ class TasksModel extends Model
         $id = $_POST['id'];
         if (!empty($id))
         {
-            $currentTasks = $this->getTasks();
-            $foundKey = $this->findTaskByID($currentTasks, $id);
-            $currentTasks[$foundKey]['checked'] = !$currentTasks[$foundKey]['checked'];
-            $this->setTasksToCookie($currentTasks);
+            $query = "UPDATE tasks SET status = (status - 1) * -1 WHERE id = :id";
+            $this->executeQuery($query, ['id'], [$id]);
         }
     }
 
     public function checkAllTasks(): void
     {
-        $currentTasks = $this->getTasks();
-        for ($i = 0; $i < count($currentTasks); $i++)
-        {
-            $currentTasks[$i]['checked'] = true;
-        }
-        $this->setTasksToCookie($currentTasks);
+        $query = "UPDATE tasks SET status = 1 WHERE user_id = :user_id";
+        $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
     }
 }
