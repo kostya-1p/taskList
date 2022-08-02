@@ -2,7 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Models\LoginModel;
+use App\Models\User;
+use App\Models\RegistrationModel;
 use App\View;
 
 class LoginController
@@ -21,15 +22,44 @@ class LoginController
         $password = htmlspecialchars($_POST['password']);
 
         //Find user with entered login and password in database
-        $loginModel = new LoginModel();
-        $isUserFound = $loginModel->isUserLogged($login, $password);
+        $userModel = new User();
+        $isUserFound = $userModel->isUserLogged($login, $password);
 
         if ($isUserFound)
         {
             header('Location: /tasks');
         }
 
-        //Send login error to View
-        return View::make('login', ['loginErr' => 'Invalid Login or Password']);
+        return $this->register();
+    }
+
+    public function register(): View
+    {
+        //Check user input for empty fields
+        if (empty($_POST['login']) || empty($_POST['password']))
+        {
+            return $this->sendErrorMessage('Fields must not be empty');
+        }
+
+        $userModel = new User();
+
+        //Handle user input
+        $login = htmlspecialchars($_POST['login']);
+        $password = htmlspecialchars($_POST['password']);
+
+        //Register user
+        $result = $userModel->registerUser($login, $password);
+
+        if ($result)
+        {
+            header('Location: /tasks');
+        }
+
+        return $this->sendErrorMessage('User with the same username already exists');
+    }
+
+    private function sendErrorMessage(string $message): View
+    {
+        return View::make('login', ['loginErr' => $message]);
     }
 }

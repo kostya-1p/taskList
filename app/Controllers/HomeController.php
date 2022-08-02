@@ -26,40 +26,57 @@ class HomeController
         }
 
         //Get tasks and send them to View
-        $tasks = $this->tasksModel->getTasks();
+        $tasks = $this->tasksModel->getTasks($_SESSION['id']);
         return View::make('index', ['tasks' => $tasks]);
     }
 
     public function create()
     {
-        $this->callTaskModelFunction('addTask');
+        if (!empty($_POST['description']))
+        {
+            //handle user input and add task to database
+            $description = htmlspecialchars($_POST['description']);
+            session_start();
+            $this->callTaskModelFunction('addTask', [$_SESSION['id'], $description]);
+        }
     }
 
     public function delete()
     {
-        $this->callTaskModelFunction('deleteTask');
+        session_start();
+        $taskId = $_POST['id'];
+        if (!empty($taskId))
+        {
+            $this->callTaskModelFunction('deleteTask', [$taskId, $_SESSION['id']]);
+        }
     }
 
     public function deleteAllTasks()
     {
-        $this->callTaskModelFunction('deleteAllTasks');
+        session_start();
+        $this->callTaskModelFunction('deleteAllTasks', [$_SESSION['id']]);
     }
 
     public function checkTask()
     {
-        $this->callTaskModelFunction('checkTask');
+        session_start();
+        $taskId = $_POST['id'];
+        if (!empty($taskId))
+        {
+            $this->callTaskModelFunction('checkTask', [$taskId, $_SESSION['id']]);
+        }
     }
 
     public function checkAllTasks()
     {
-        $this->callTaskModelFunction('checkAllTasks');
+        session_start();
+        $this->callTaskModelFunction('checkAllTasks', [$_SESSION['id']]);
     }
 
-    private function callTaskModelFunction(string $methodName)
+    private function callTaskModelFunction(string $methodName, array $args)
     {
         //Call method from task model and go to /tasks page
-        session_start();
-        $this->tasksModel->{$methodName}();
+        call_user_func_array([$this->tasksModel, $methodName], $args);
         $this->setHeader();
     }
 

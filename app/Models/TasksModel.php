@@ -6,12 +6,12 @@ use App\Model;
 
 class TasksModel extends Model
 {
-    public function getTasks(): array
+    public function getTasks(int $user_id): array
     {
         //Get tasks from DB
         $query = "SELECT id, description, status FROM tasks WHERE user_id = :user_id
                   ORDER BY created_at";
-        $stmt = $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
+        $stmt = $this->executeQuery($query, ['user_id'], [$user_id]);
 
         //Get task array if task table is not empty
         if ($stmt->rowCount() > 0)
@@ -22,37 +22,49 @@ class TasksModel extends Model
         return [];
     }
 
-    public function addTask(): void
+    public function getSingleTask(int $taskId): array
     {
-        if (!empty($_POST['description']))
-        {
-            //handle user input and add task to database
-            $description = htmlspecialchars($_POST['description']);
-            $query = "INSERT INTO tasks(user_id, description) VALUES (:user_id, :description)";
-            $this->executeQuery($query, ['user_id', 'description'], [$_SESSION['id'], $description]);
-        }
+        $query = "SELECT * FROM tasks WHERE id = :id";
+        $stmt = $this->executeQuery($query, ['id'], [$taskId]);
+        return $stmt->fetch();
     }
 
-    public function deleteTask(): void
+    private function hasTask(int $taskId, int $userId): bool
     {
-        $taskId = $_POST['id'];
-        if (!empty($taskId))
+        $task = $this->getSingleTask($taskId);
+
+        if (!empty($task) && $task['user_id'] == $userId)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public function addTask(int $user_id, string $description): void
+    {
+        //add task to database
+        $query = "INSERT INTO tasks(user_id, description) VALUES (:user_id, :description)";
+        $this->executeQuery($query, ['user_id', 'description'], [$user_id, $description]);
+    }
+
+    public function deleteTask(int $taskId, int $userId): void
+    {
+        if ($this->hasTask($taskId, $userId))
         {
             $query = "DELETE FROM tasks WHERE id = :id";
             $this->executeQuery($query, ['id'], [$taskId]);
         }
     }
 
-    public function deleteAllTasks(): void
+    public function deleteAllTasks(int $user_id): void
     {
         $query = "DELETE FROM tasks WHERE user_id = :user_id";
-        $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
+        $this->executeQuery($query, ['user_id'], [$user_id]);
     }
 
-    public function checkTask(): void
+    public function checkTask(int $taskId, int $userId): void
     {
-        $taskId = $_POST['id'];
-        if (!empty($taskId))
+        if ($this->hasTask($taskId, $userId))
         {
             //Change task status to opposite
             $query = "UPDATE tasks SET status = (status - 1) * -1 WHERE id = :id";
@@ -60,10 +72,10 @@ class TasksModel extends Model
         }
     }
 
-    public function checkAllTasks(): void
+    public function checkAllTasks(int $user_id): void
     {
         //Change status of all tasks to opposite
         $query = "UPDATE tasks SET status = 1 WHERE user_id = :user_id";
-        $this->executeQuery($query, ['user_id'], [$_SESSION['id']]);
+        $this->executeQuery($query, ['user_id'], [$user_id]);
     }
 }
