@@ -13,12 +13,12 @@ class HomeController
     public function __construct()
     {
         $this->tasksModel = new TasksModel();
+        session_start();
     }
 
     public function index(): View
     {
         //Check if user is logged in
-        session_start();
         if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true)
         {
             header("location: /");
@@ -36,14 +36,12 @@ class HomeController
         {
             //handle user input and add task to database
             $description = htmlspecialchars($_POST['description']);
-            session_start();
             $this->callTaskModelFunction('addTask', [$_SESSION['id'], $description]);
         }
     }
 
     public function delete()
     {
-        session_start();
         $taskId = $_POST['id'];
         if (!empty($taskId))
         {
@@ -53,13 +51,11 @@ class HomeController
 
     public function deleteAllTasks()
     {
-        session_start();
         $this->callTaskModelFunction('deleteAllTasks', [$_SESSION['id']]);
     }
 
     public function checkTask()
     {
-        session_start();
         $taskId = $_POST['id'];
         if (!empty($taskId))
         {
@@ -69,7 +65,6 @@ class HomeController
 
     public function checkAllTasks()
     {
-        session_start();
         $this->callTaskModelFunction('checkAllTasks', [$_SESSION['id']]);
     }
 
